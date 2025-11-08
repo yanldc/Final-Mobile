@@ -20,33 +20,61 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   List<PokemonCard> _cards = [];
-  bool _isLoading = true;
+  bool _isLoading = false;
   String _error = '';
   List<String> _favoritos = [];
   List<String> _minhasCartas = [];
+  List<String> _types = [];
+  List<String> _rarities = [];
+  String? _selectedType;
+  String? _selectedRarity;
+  bool _filtersLoaded = false;
 
   @override
   void initState() {
     super.initState();
-    _loadCards();
+    _loadFilters();
   }
 
-  Future<void> _loadCards() async {
+  Future<void> _loadFilters() async {
+    setState(() {
+      _types = PokemonApiService.getTypes();
+      _rarities = PokemonApiService.getRarities();
+      _filtersLoaded = true;
+    });
+  }
+
+  Future<void> _searchCards() async {
+    if (_selectedType == null && _selectedRarity == null) {
+      setState(() => _error = 'Selecione pelo menos um filtro');
+      return;
+    }
+    
     try {
       setState(() {
         _isLoading = true;
         _error = '';
       });
       
-      final cards = await PokemonApiService.getCards();
+      final cards = await PokemonApiService.getCardsWithFilters(
+        type: _selectedType,
+        rarity: _selectedRarity,
+      );
+      
       final user = AuthService.getCurrentUser();
+      
+      List<String> favoritos = [];
+      List<String> minhasCartas = [];
+      
       if (user != null) {
-        _favoritos = UserService.getFavoritos(user.id);
-        _minhasCartas = UserService.getMinhasCartas(user.id);
+        favoritos = UserService.getFavoritos(user.id);
+        minhasCartas = UserService.getMinhasCartas(user.id);
       }
       
       setState(() {
         _cards = cards;
+        _favoritos = favoritos;
+        _minhasCartas = minhasCartas;
         _isLoading = false;
       });
     } catch (e) {
@@ -64,7 +92,10 @@ class _HomeScreenState extends State<HomeScreen> {
         await UserService.removeFromFavoritos(user.id, cardId);
         _favoritos.remove(cardId);
       } else {
-        await UserService.addToFavoritos(user.id, cardId);
+        final card = _cards.firstWhere((c) => c.id == cardId);
+        final cardData = '{"id":"${card.id}","images":{"small":"${card.smallImageUrl}","large":"${card.imageUrl}"}}';
+        
+        await UserService.addToFavoritos(user.id, cardId, cardData: cardData);
         _favoritos.add(cardId);
       }
       setState(() {});
@@ -78,7 +109,10 @@ class _HomeScreenState extends State<HomeScreen> {
         await UserService.removeFromMinhasCartas(user.id, cardId);
         _minhasCartas.remove(cardId);
       } else {
-        await UserService.addToMinhasCartas(user.id, cardId);
+        final card = _cards.firstWhere((c) => c.id == cardId);
+        final cardData = '{"id":"${card.id}","images":{"small":"${card.smallImageUrl}","large":"${card.imageUrl}"}}';
+        
+        await UserService.addToMinhasCartas(user.id, cardId, cardData: cardData);
         _minhasCartas.add(cardId);
       }
       setState(() {});
@@ -94,12 +128,25 @@ class _HomeScreenState extends State<HomeScreen> {
             const CircularProgressIndicator(color: Color(0xFF560982)),
             const SizedBox(height: 16),
             Text(
-              'Carregando cartas...',
+              _filtersLoaded ? 'Carregando cartas...' : 'Carregando filtros...',
               style: TextStyle(
                 color: themeController.isDarkMode ? Colors.white : Colors.black,
               ),
             ),
           ],
+        ),
+      );
+    }
+
+    if (!_filtersLoaded) {
+      return Center(
+        child: ElevatedButton(
+          onPressed: _loadFilters,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF560982),
+            foregroundColor: Colors.white,
+          ),
+          child: const Text('Carregar Filtros'),
         ),
       );
     }
@@ -133,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: _loadCards,
+              onPressed: _searchCards,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF560982),
                 foregroundColor: Colors.white,
@@ -145,9 +192,129 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    return RefreshIndicator(
-      onRefresh: _loadCards,
-      child: GridView.builder(
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          color: themeController.isDarkMode ? Colors.grey[800] : Colors.grey[100],
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedType,
+                      decoration: InputDecoration(
+                        labelText: 'Tipo',
+                        labelStyle: TextStyle(
+                          color: themeController.isDarkMode ? Colors.white70 : const Color(0xFF560982),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Color(0xFF560982), width: 2),
+                        ),
+                        filled: true,
+                        fillColor: themeController.isDarkMode ? Colors.grey[800] : Colors.white,
+                      ),
+                      dropdownColor: themeController.isDarkMode ? Colors.grey[800] : Colors.white,
+                      style: TextStyle(
+                        color: themeController.isDarkMode ? Colors.white : Colors.black,
+                      ),
+                      items: [
+                        DropdownMenuItem(
+                          value: null, 
+                          child: Text(
+                            'Todos os tipos',
+                            style: TextStyle(
+                              color: themeController.isDarkMode ? Colors.white70 : Colors.black54,
+                            ),
+                          ),
+                        ),
+                        ..._types.map((type) => DropdownMenuItem(
+                          value: type,
+                          child: Text(type),
+                        )),
+                      ],
+                      onChanged: (value) => setState(() => _selectedType = value),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedRarity,
+                      decoration: InputDecoration(
+                        labelText: 'Raridade',
+                        labelStyle: TextStyle(
+                          color: themeController.isDarkMode ? Colors.white70 : const Color(0xFF560982),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Color(0xFF560982), width: 2),
+                        ),
+                        filled: true,
+                        fillColor: themeController.isDarkMode ? Colors.grey[800] : Colors.white,
+                      ),
+                      dropdownColor: themeController.isDarkMode ? Colors.grey[800] : Colors.white,
+                      style: TextStyle(
+                        color: themeController.isDarkMode ? Colors.white : Colors.black,
+                      ),
+                      items: [
+                        DropdownMenuItem(
+                          value: null, 
+                          child: Text(
+                            'Todas as raridades',
+                            style: TextStyle(
+                              color: themeController.isDarkMode ? Colors.white70 : Colors.black54,
+                            ),
+                          ),
+                        ),
+                        ..._rarities.map((rarity) => DropdownMenuItem(
+                          value: rarity,
+                          child: Text(rarity),
+                        )),
+                      ],
+                      onChanged: (value) => setState(() => _selectedRarity = value),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _searchCards,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF560982),
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('Pesquisar'),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (_cards.isEmpty && !_isLoading && _error.isEmpty)
+          Expanded(
+            child: Center(
+              child: Text(
+                'Selecione os filtros e clique em Pesquisar',
+                style: TextStyle(
+                  color: themeController.isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+            ),
+          )
+        else if (_cards.isNotEmpty)
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: _searchCards,
+              child: GridView.builder(
         padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
@@ -264,7 +431,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
-      ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 

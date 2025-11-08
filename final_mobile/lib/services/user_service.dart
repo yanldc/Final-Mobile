@@ -47,7 +47,7 @@ class UserService {
     return null;
   }
 
-  static Future<void> addToFavoritos(String userId, String cardId) async {
+  static Future<void> addToFavoritos(String userId, String cardId, {String? cardData}) async {
     if (_box == null) await init();
     
     final user = _box!.get(userId);
@@ -57,6 +57,12 @@ class UserService {
         favoritos.add(cardId);
         user.favoritos = favoritos.join(',');
         await user.save();
+        
+        // Salva dados da carta localmente se fornecidos
+        if (cardData != null) {
+          final cardBox = await Hive.openBox('cards_cache');
+          await cardBox.put(cardId, cardData);
+        }
       }
     }
   }
@@ -73,7 +79,7 @@ class UserService {
     }
   }
 
-  static Future<void> addToMinhasCartas(String userId, String cardId) async {
+  static Future<void> addToMinhasCartas(String userId, String cardId, {String? cardData}) async {
     if (_box == null) await init();
     
     final user = _box!.get(userId);
@@ -83,6 +89,12 @@ class UserService {
         minhasCartas.add(cardId);
         user.minhas_cartas = minhasCartas.join(',');
         await user.save();
+        
+        // Salva dados da carta localmente se fornecidos
+        if (cardData != null) {
+          final cardBox = await Hive.openBox('cards_cache');
+          await cardBox.put(cardId, cardData);
+        }
       }
     }
   }
@@ -102,17 +114,24 @@ class UserService {
   static List<String> getFavoritos(String userId) {
     if (_box == null) return [];
     final user = _box!.get(userId);
-    return user?.favoritos.isEmpty == true ? [] : user?.favoritos.split(',') ?? [];
+    if (user == null || user.favoritos.isEmpty) return [];
+    return user.favoritos.split(',').where((id) => id.isNotEmpty).toList();
   }
 
   static List<String> getMinhasCartas(String userId) {
     if (_box == null) return [];
     final user = _box!.get(userId);
-    return user?.minhas_cartas.isEmpty == true ? [] : user?.minhas_cartas.split(',') ?? [];
+    if (user == null || user.minhas_cartas.isEmpty) return [];
+    return user.minhas_cartas.split(',').where((id) => id.isNotEmpty).toList();
   }
 
   static Future<UserModel?> getUserById(String id) async {
     if (_box == null) await init();
     return _box!.get(id);
+  }
+  
+  static Future<String?> getCachedCardData(String cardId) async {
+    final cardBox = await Hive.openBox('cards_cache');
+    return cardBox.get(cardId);
   }
 }
