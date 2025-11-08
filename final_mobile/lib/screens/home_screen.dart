@@ -32,6 +32,10 @@ class _HomeScreenState extends State<HomeScreen> {
   final _searchController = TextEditingController();
   bool _showFilters = false;
   bool _showNameSearch = false;
+  int _currentPage = 1;
+  bool _hasMorePages = true;
+  bool _isLoadingMore = false;
+  String _lastSearchType = '';
 
   @override
   void initState() {
@@ -57,12 +61,16 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _isLoading = true;
         _error = '';
-        _showFilters = false; // Recolhe após pesquisar
+        _showFilters = false;
+        _currentPage = 1;
+        _hasMorePages = true;
+        _lastSearchType = 'filters';
       });
       
       final cards = await PokemonApiService.getCardsWithFilters(
         type: _selectedType,
         rarity: _selectedRarity,
+        page: _currentPage,
       );
       
       final user = AuthService.getCurrentUser();
@@ -80,6 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _favoritos = favoritos;
         _minhasCartas = minhasCartas;
         _isLoading = false;
+        _hasMorePages = cards.length == 8;
       });
     } catch (e) {
       setState(() {
@@ -100,10 +109,13 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _isLoading = true;
         _error = '';
-        _showNameSearch = false; // Recolhe após pesquisar
+        _showNameSearch = false;
+        _currentPage = 1;
+        _hasMorePages = true;
+        _lastSearchType = 'name';
       });
       
-      final cards = await PokemonApiService.searchCards(query);
+      final cards = await PokemonApiService.searchCards(query, page: _currentPage);
       
       final user = AuthService.getCurrentUser();
       
@@ -120,11 +132,47 @@ class _HomeScreenState extends State<HomeScreen> {
         _favoritos = favoritos;
         _minhasCartas = minhasCartas;
         _isLoading = false;
+        _hasMorePages = cards.length == 8;
       });
     } catch (e) {
       setState(() {
         _error = e.toString();
         _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loadMoreCards() async {
+    if (_isLoadingMore || !_hasMorePages) return;
+    
+    try {
+      setState(() => _isLoadingMore = true);
+      
+      List<PokemonCard> newCards = [];
+      
+      if (_lastSearchType == 'filters') {
+        newCards = await PokemonApiService.getCardsWithFilters(
+          type: _selectedType,
+          rarity: _selectedRarity,
+          page: _currentPage + 1,
+        );
+      } else if (_lastSearchType == 'name') {
+        newCards = await PokemonApiService.searchCards(
+          _searchController.text.trim(),
+          page: _currentPage + 1,
+        );
+      }
+      
+      setState(() {
+        _cards.addAll(newCards);
+        _currentPage++;
+        _hasMorePages = newCards.length == 8;
+        _isLoadingMore = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoadingMore = false;
+        _error = 'Erro ao carregar mais cartas';
       });
     }
   }
@@ -224,7 +272,15 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: _searchCards,
+              onPressed: () {
+                if (_lastSearchType == 'filters') {
+                  _searchCards();
+                } else if (_lastSearchType == 'name') {
+                  _searchByName();
+                } else {
+                  _searchCards();
+                }
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF560982),
                 foregroundColor: Colors.white,
@@ -459,8 +515,17 @@ class _HomeScreenState extends State<HomeScreen> {
         else if (_cards.isNotEmpty)
           Expanded(
             child: RefreshIndicator(
-              onRefresh: _searchCards,
-              child: GridView.builder(
+              onRefresh: () async {
+                if (_lastSearchType == 'filters') {
+                  await _searchCards();
+                } else if (_lastSearchType == 'name') {
+                  await _searchByName();
+                }
+              },
+              child: Column(
+                children: [
+                  Expanded(
+                    child: GridView.builder(
         padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
@@ -578,6 +643,33 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
+                    ),
+                  ),
+                  if (_hasMorePages)
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _isLoadingMore ? null : _loadMoreCards,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF560982),
+                            foregroundColor: Colors.white,
+                          ),
+                          child: _isLoadingMore
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Text('Carregar Mais'),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
           ),
