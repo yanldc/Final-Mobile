@@ -125,11 +125,6 @@ class UserService {
     return user.minhas_cartas.split(',').where((id) => id.isNotEmpty).toList();
   }
 
-  static Future<UserModel?> getUserById(String id) async {
-    if (_box == null) await init();
-    return _box!.get(id);
-  }
-  
   static Future<String?> getCachedCardData(String cardId) async {
     final cardBox = await Hive.openBox('cards_cache');
     return cardBox.get(cardId);
