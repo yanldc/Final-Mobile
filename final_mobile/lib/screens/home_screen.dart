@@ -137,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _favoritos.remove(cardId);
       } else {
         final card = _cards.firstWhere((c) => c.id == cardId);
-        final cardData = '{"id":"${card.id}","images":{"small":"${card.smallImageUrl}","large":"${card.imageUrl}"}}';
+        final cardData = '{"id":"${card.id}","name":"${card.name}","images":{"small":"${card.smallImageUrl}","large":"${card.imageUrl}"},"set":{"name":"${card.setName}"}}';
         
         await UserService.addToFavoritos(user.id, cardId, cardData: cardData);
         _favoritos.add(cardId);
@@ -154,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _minhasCartas.remove(cardId);
       } else {
         final card = _cards.firstWhere((c) => c.id == cardId);
-        final cardData = '{"id":"${card.id}","images":{"small":"${card.smallImageUrl}","large":"${card.imageUrl}"}}';
+        final cardData = '{"id":"${card.id}","name":"${card.name}","images":{"small":"${card.smallImageUrl}","large":"${card.imageUrl}"},"set":{"name":"${card.setName}"}}';
         
         await UserService.addToMinhasCartas(user.id, cardId, cardData: cardData);
         _minhasCartas.add(cardId);
@@ -464,9 +464,9 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          childAspectRatio: 0.7,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
+          childAspectRatio: 0.6,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
         ),
         itemCount: _cards.length,
         itemBuilder: (context, index) {
@@ -485,7 +485,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: card.smallImageUrl != null
                         ? Image.network(
                             card.smallImageUrl!,
-                            fit: BoxFit.cover,
+                            fit: BoxFit.contain,
                             width: double.infinity,
                             loadingBuilder: (context, child, loadingProgress) {
                               if (loadingProgress == null) return child;
@@ -517,30 +517,31 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 4.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         card.name,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                          fontSize: 12,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Text(
                         card.setName,
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 10,
                           color: Colors.grey[600],
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 4),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -551,10 +552,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: _favoritos.contains(card.id) 
                                   ? Colors.red 
                                   : Colors.grey,
-                              size: 20,
+                              size: 18,
                             ),
                             padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
+                            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                           ),
                           IconButton(
                             onPressed: () => _toggleMinhaCarta(card.id),
@@ -563,10 +564,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: _minhasCartas.contains(card.id) 
                                   ? const Color(0xFF560982) 
                                   : Colors.grey,
-                              size: 20,
+                              size: 18,
                             ),
                             padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
+                            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                           ),
                         ],
                       ),

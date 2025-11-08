@@ -9,7 +9,7 @@ class PokemonApiService {
   static Future<List<PokemonCard>> getCards({int page = 1, int pageSize = 12}) async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/cards?page=$page&pageSize=$pageSize&select=id,images'),
+        Uri.parse('$_baseUrl/cards?page=$page&pageSize=$pageSize&select=id,name,images,set'),
         headers: {
           'X-Api-Key': _apiKey,
           'Content-Type': 'application/json',

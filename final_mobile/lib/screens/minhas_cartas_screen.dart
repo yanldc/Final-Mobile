@@ -196,9 +196,9 @@ class _MinhasCartasScreenState extends State<MinhasCartasScreen> {
         padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          childAspectRatio: 0.7,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
+          childAspectRatio: 0.6,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
         ),
         itemCount: _minhasCartasCards.length,
         itemBuilder: (context, index) {
@@ -217,7 +217,7 @@ class _MinhasCartasScreenState extends State<MinhasCartasScreen> {
                     child: card.smallImageUrl != null
                         ? Image.network(
                             card.smallImageUrl!,
-                            fit: BoxFit.cover,
+                            fit: BoxFit.contain,
                             width: double.infinity,
                             loadingBuilder: (context, child, loadingProgress) {
                               if (loadingProgress == null) return child;
@@ -249,40 +249,41 @@ class _MinhasCartasScreenState extends State<MinhasCartasScreen> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 4.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         card.name,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                          fontSize: 12,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Text(
                         card.setName,
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 10,
                           color: Colors.grey[600],
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 4),
                       Center(
                         child: IconButton(
                           onPressed: () => _removeMinhaCarta(card.id),
                           icon: const Icon(
                             Icons.style,
                             color: Color(0xFF560982),
-                            size: 20,
+                            size: 18,
                           ),
                           padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
+                          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                         ),
                       ),
                     ],
