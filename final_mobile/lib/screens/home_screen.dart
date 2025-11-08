@@ -30,6 +30,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _selectedRarity;
   bool _filtersLoaded = false;
   final _searchController = TextEditingController();
+  bool _showFilters = false;
+  bool _showNameSearch = false;
 
   @override
   void initState() {
@@ -55,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _isLoading = true;
         _error = '';
+        _showFilters = false; // Recolhe após pesquisar
       });
       
       final cards = await PokemonApiService.getCardsWithFilters(
@@ -97,6 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _isLoading = true;
         _error = '';
+        _showNameSearch = false; // Recolhe após pesquisar
       });
       
       final cards = await PokemonApiService.searchCards(query);
@@ -239,13 +243,172 @@ class _HomeScreenState extends State<HomeScreen> {
           color: themeController.isDarkMode ? Colors.grey[800] : Colors.grey[100],
           child: Column(
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      value: _selectedType,
+              // Botão Tipo/Raridade
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => setState(() {
+                    _showFilters = !_showFilters;
+                    _showNameSearch = false;
+                  }),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _showFilters ? const Color(0xFF560982) : Colors.grey,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Pesquisar por Tipo/Raridade'),
+                      const SizedBox(width: 8),
+                      Icon(_showFilters ? Icons.expand_less : Icons.expand_more),
+                    ],
+                  ),
+                ),
+              ),
+              // Filtros expansíveis
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                height: _showFilters ? null : 0,
+                child: _showFilters ? Column(
+                  children: [
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<String>(
+                            value: _selectedType,
+                            decoration: InputDecoration(
+                              labelText: 'Tipo',
+                              labelStyle: TextStyle(
+                                color: themeController.isDarkMode ? Colors.white70 : const Color(0xFF560982),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: Color(0xFF560982), width: 2),
+                              ),
+                              filled: true,
+                              fillColor: themeController.isDarkMode ? Colors.grey[800] : Colors.white,
+                            ),
+                            dropdownColor: themeController.isDarkMode ? Colors.grey[800] : Colors.white,
+                            style: TextStyle(
+                              color: themeController.isDarkMode ? Colors.white : Colors.black,
+                            ),
+                            items: [
+                              DropdownMenuItem(
+                                value: null, 
+                                child: Text(
+                                  'Todos os tipos',
+                                  style: TextStyle(
+                                    color: themeController.isDarkMode ? Colors.white70 : Colors.black54,
+                                  ),
+                                ),
+                              ),
+                              ..._types.map((type) => DropdownMenuItem(
+                                value: type,
+                                child: Text(type),
+                              )),
+                            ],
+                            onChanged: (value) => setState(() => _selectedType = value),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: DropdownButtonFormField<String>(
+                            value: _selectedRarity,
+                            decoration: InputDecoration(
+                              labelText: 'Raridade',
+                              labelStyle: TextStyle(
+                                color: themeController.isDarkMode ? Colors.white70 : const Color(0xFF560982),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: Color(0xFF560982), width: 2),
+                              ),
+                              filled: true,
+                              fillColor: themeController.isDarkMode ? Colors.grey[800] : Colors.white,
+                            ),
+                            dropdownColor: themeController.isDarkMode ? Colors.grey[800] : Colors.white,
+                            style: TextStyle(
+                              color: themeController.isDarkMode ? Colors.white : Colors.black,
+                            ),
+                            items: [
+                              DropdownMenuItem(
+                                value: null, 
+                                child: Text(
+                                  'Todas as raridades',
+                                  style: TextStyle(
+                                    color: themeController.isDarkMode ? Colors.white70 : Colors.black54,
+                                  ),
+                                ),
+                              ),
+                              ..._rarities.map((rarity) => DropdownMenuItem(
+                                value: rarity,
+                                child: Text(rarity),
+                              )),
+                            ],
+                            onChanged: (value) => setState(() => _selectedRarity = value),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _searchCards,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF560982),
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Text('Pesquisar'),
+                      ),
+                    ),
+                  ],
+                ) : const SizedBox.shrink(),
+              ),
+              const SizedBox(height: 16),
+              // Botão Nome
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => setState(() {
+                    _showNameSearch = !_showNameSearch;
+                    _showFilters = false;
+                  }),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _showNameSearch ? const Color(0xFF560982) : Colors.grey,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Pesquisar por Nome'),
+                      const SizedBox(width: 8),
+                      Icon(_showNameSearch ? Icons.expand_less : Icons.expand_more),
+                    ],
+                  ),
+                ),
+              ),
+              // Campo nome expansível
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                height: _showNameSearch ? null : 0,
+                child: _showNameSearch ? Column(
+                  children: [
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _searchController,
+                      style: TextStyle(
+                        color: themeController.isDarkMode ? Colors.white : Colors.black,
+                      ),
                       decoration: InputDecoration(
-                        labelText: 'Tipo',
+                        labelText: 'Nome da carta',
                         labelStyle: TextStyle(
                           color: themeController.isDarkMode ? Colors.white70 : const Color(0xFF560982),
                         ),
@@ -258,123 +421,26 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         filled: true,
                         fillColor: themeController.isDarkMode ? Colors.grey[800] : Colors.white,
-                      ),
-                      dropdownColor: themeController.isDarkMode ? Colors.grey[800] : Colors.white,
-                      style: TextStyle(
-                        color: themeController.isDarkMode ? Colors.white : Colors.black,
-                      ),
-                      items: [
-                        DropdownMenuItem(
-                          value: null, 
-                          child: Text(
-                            'Todos os tipos',
-                            style: TextStyle(
-                              color: themeController.isDarkMode ? Colors.white70 : Colors.black54,
-                            ),
-                          ),
-                        ),
-                        ..._types.map((type) => DropdownMenuItem(
-                          value: type,
-                          child: Text(type),
-                        )),
-                      ],
-                      onChanged: (value) => setState(() => _selectedType = value),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      value: _selectedRarity,
-                      decoration: InputDecoration(
-                        labelText: 'Raridade',
-                        labelStyle: TextStyle(
+                        prefixIcon: Icon(
+                          Icons.search,
                           color: themeController.isDarkMode ? Colors.white70 : const Color(0xFF560982),
                         ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFF560982), width: 2),
-                        ),
-                        filled: true,
-                        fillColor: themeController.isDarkMode ? Colors.grey[800] : Colors.white,
                       ),
-                      dropdownColor: themeController.isDarkMode ? Colors.grey[800] : Colors.white,
-                      style: TextStyle(
-                        color: themeController.isDarkMode ? Colors.white : Colors.black,
-                      ),
-                      items: [
-                        DropdownMenuItem(
-                          value: null, 
-                          child: Text(
-                            'Todas as raridades',
-                            style: TextStyle(
-                              color: themeController.isDarkMode ? Colors.white70 : Colors.black54,
-                            ),
-                          ),
-                        ),
-                        ..._rarities.map((rarity) => DropdownMenuItem(
-                          value: rarity,
-                          child: Text(rarity),
-                        )),
-                      ],
-                      onChanged: (value) => setState(() => _selectedRarity = value),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _searchCards,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF560982),
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text('Pesquisar por Filtros'),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Divider(),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _searchController,
-                style: TextStyle(
-                  color: themeController.isDarkMode ? Colors.white : Colors.black,
-                ),
-                decoration: InputDecoration(
-                  labelText: 'Nome da carta',
-                  labelStyle: TextStyle(
-                    color: themeController.isDarkMode ? Colors.white70 : const Color(0xFF560982),
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFF560982), width: 2),
-                  ),
-                  filled: true,
-                  fillColor: themeController.isDarkMode ? Colors.grey[800] : Colors.white,
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: themeController.isDarkMode ? Colors.white70 : const Color(0xFF560982),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _searchByName,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF560982),
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text('Pesquisar por Nome'),
-                ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _searchByName,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF560982),
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Text('Pesquisar'),
+                      ),
+                    ),
+                  ],
+                ) : const SizedBox.shrink(),
               ),
             ],
           ),
