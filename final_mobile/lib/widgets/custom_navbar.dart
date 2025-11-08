@@ -29,8 +29,8 @@ class CustomNavbar extends StatelessWidget {
           label: 'Favoritos',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.watch_later),
-          label: 'Ver Depois',
+          icon: Icon(Icons.style),
+          label: 'Minhas Cartas',
         ),
       ],
     );

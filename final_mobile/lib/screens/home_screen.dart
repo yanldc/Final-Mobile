@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/custom_navbar.dart';
 import 'favoritos_screen.dart';
-import 'ver_depois_screen.dart';
+import 'minhas_cartas_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     ),
     const FavoritosScreen(),
-    const VerDepoisScreen(),
+    const MinhasCartasScreen(),
   ];
 
   @override
