@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../widgets/custom_navbar.dart';
+import '../controllers/theme_controller.dart';
+import '../widgets/theme_toggle_button.dart';
 import 'favoritos_screen.dart';
 import 'minhas_cartas_screen.dart';
 
@@ -13,14 +16,14 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
-    const Center(
+  List<Widget> _getScreens(ThemeController themeController) => [
+    Center(
       child: Text(
         'Tela Inicial',
         style: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF560982),
+          color: themeController.isDarkMode ? Colors.white : const Color(0xFF560982),
         ),
       ),
     ),
@@ -30,16 +33,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: _screens[_currentIndex],
-      bottomNavigationBar: CustomNavbar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+    return GetBuilder<ThemeController>(
+      builder: (themeController) => Scaffold(
+        backgroundColor: themeController.isDarkMode ? Colors.black : Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          actions: const [ThemeToggleButton()],
+        ),
+        body: _getScreens(themeController)[_currentIndex],
+        bottomNavigationBar: CustomNavbar(
+          currentIndex: _currentIndex,
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+        ),
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/user_service.dart';
+import '../widgets/theme_toggle_button.dart';
 
 class CadastroScreen extends StatefulWidget {
   const CadastroScreen({super.key});
@@ -52,8 +53,13 @@ class _CadastroScreenState extends State<CadastroScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF560982), // Roxo escuro
-
+      backgroundColor: const Color(0xFF560982),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+        actions: const [ThemeToggleButton()],
+      ),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -66,7 +72,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -93,7 +99,10 @@ class _CadastroScreenState extends State<CadastroScreen> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        prefixIcon: const Icon(Icons.person, color: Color(0xFF560982)),
+                        prefixIcon: const Icon(
+                          Icons.person,
+                          color: Color(0xFF560982),
+                        ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(color: Color(0xFF560982), width: 2),
@@ -117,7 +126,10 @@ class _CadastroScreenState extends State<CadastroScreen> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        prefixIcon: const Icon(Icons.lock, color: Color(0xFF560982)),
+                        prefixIcon: const Icon(
+                          Icons.lock,
+                          color: Color(0xFF560982),
+                        ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(color: Color(0xFF560982), width: 2),
@@ -142,7 +154,10 @@ class _CadastroScreenState extends State<CadastroScreen> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF560982)),
+                        prefixIcon: const Icon(
+                          Icons.lock_outline,
+                          color: Color(0xFF560982),
+                        ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(color: Color(0xFF560982), width: 2),
