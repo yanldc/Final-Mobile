@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'models/user_model.dart';
+import 'services/user_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  await Hive.initFlutter();
+  Hive.registerAdapter(UserModelAdapter());
+  await UserService.init();
+  
   runApp(const MyApp());
 }
 
