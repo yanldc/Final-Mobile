@@ -85,8 +85,8 @@ class PokemonApiService {
       }
       
       final url = query.isEmpty 
-          ? '$_baseUrl/cards?pageSize=12&select=id,images'
-          : '$_baseUrl/cards?q=$query&pageSize=12&select=id,images';
+          ? '$_baseUrl/cards?pageSize=12&select=id,name,images,set'
+          : '$_baseUrl/cards?q=$query&pageSize=12&select=id,name,images,set';
       
       final response = await http.get(
         Uri.parse(url),
@@ -103,6 +103,29 @@ class PokemonApiService {
         return cardsJson.map((cardJson) => PokemonCard.fromJson(cardJson)).toList();
       } else {
         throw Exception('Erro ao carregar cartas: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Erro de conexão: $e');
+    }
+  }
+
+  static Future<List<PokemonCard>> searchCards(String query) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$_baseUrl/cards?q=name:$query*&pageSize=12&select=id,name,images,set'),
+        headers: {
+          'X-Api-Key': _apiKey,
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final List<dynamic> cardsJson = data['data'] ?? [];
+        
+        return cardsJson.map((cardJson) => PokemonCard.fromJson(cardJson)).toList();
+      } else {
+        throw Exception('Erro ao buscar cartas: ${response.statusCode}');
       }
     } catch (e) {
       throw Exception('Erro de conexão: $e');

@@ -29,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _selectedType;
   String? _selectedRarity;
   bool _filtersLoaded = false;
+  final _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -60,6 +61,45 @@ class _HomeScreenState extends State<HomeScreen> {
         type: _selectedType,
         rarity: _selectedRarity,
       );
+      
+      final user = AuthService.getCurrentUser();
+      
+      List<String> favoritos = [];
+      List<String> minhasCartas = [];
+      
+      if (user != null) {
+        favoritos = UserService.getFavoritos(user.id);
+        minhasCartas = UserService.getMinhasCartas(user.id);
+      }
+      
+      setState(() {
+        _cards = cards;
+        _favoritos = favoritos;
+        _minhasCartas = minhasCartas;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _searchByName() async {
+    final query = _searchController.text.trim();
+    if (query.isEmpty) {
+      setState(() => _error = 'Digite o nome da carta');
+      return;
+    }
+    
+    try {
+      setState(() {
+        _isLoading = true;
+        _error = '';
+      });
+      
+      final cards = await PokemonApiService.searchCards(query);
       
       final user = AuthService.getCurrentUser();
       
@@ -293,7 +333,47 @@ class _HomeScreenState extends State<HomeScreen> {
                     backgroundColor: const Color(0xFF560982),
                     foregroundColor: Colors.white,
                   ),
-                  child: const Text('Pesquisar'),
+                  child: const Text('Pesquisar por Filtros'),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Divider(),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _searchController,
+                style: TextStyle(
+                  color: themeController.isDarkMode ? Colors.white : Colors.black,
+                ),
+                decoration: InputDecoration(
+                  labelText: 'Nome da carta',
+                  labelStyle: TextStyle(
+                    color: themeController.isDarkMode ? Colors.white70 : const Color(0xFF560982),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFF560982), width: 2),
+                  ),
+                  filled: true,
+                  fillColor: themeController.isDarkMode ? Colors.grey[800] : Colors.white,
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: themeController.isDarkMode ? Colors.white70 : const Color(0xFF560982),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _searchByName,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF560982),
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('Pesquisar por Nome'),
                 ),
               ),
             ],
