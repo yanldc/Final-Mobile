@@ -21,7 +21,7 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       login: fields[1] as String,
       senha: fields[2] as String,
       favoritos: fields[3] as String,
-      futuros: fields[4] as String,
+      minhas_cartas: fields[4] as String,
     );
   }
 
@@ -38,7 +38,7 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       ..writeByte(3)
       ..write(obj.favoritos)
       ..writeByte(4)
-      ..write(obj.futuros);
+      ..write(obj.minhas_cartas);
   }
 
   @override

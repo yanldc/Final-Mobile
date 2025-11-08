@@ -17,13 +17,13 @@ class UserModel extends HiveObject {
   late String favoritos;
 
   @HiveField(4)
-  late String futuros;
+  late String minhas_cartas;
 
   UserModel({
     required this.id,
     required this.login,
     required this.senha,
     this.favoritos = '',
-    this.futuros = '',
+    this.minhas_cartas = '',
   });
 }

@@ -47,24 +47,68 @@ class UserService {
     return null;
   }
 
-  static Future<void> updateFavoritos(String userId, String favoritos) async {
+  static Future<void> addToFavoritos(String userId, String cardId) async {
     if (_box == null) await init();
     
     final user = _box!.get(userId);
     if (user != null) {
-      user.favoritos = favoritos;
+      List<String> favoritos = user.favoritos.isEmpty ? [] : user.favoritos.split(',');
+      if (!favoritos.contains(cardId)) {
+        favoritos.add(cardId);
+        user.favoritos = favoritos.join(',');
+        await user.save();
+      }
+    }
+  }
+
+  static Future<void> removeFromFavoritos(String userId, String cardId) async {
+    if (_box == null) await init();
+    
+    final user = _box!.get(userId);
+    if (user != null) {
+      List<String> favoritos = user.favoritos.isEmpty ? [] : user.favoritos.split(',');
+      favoritos.remove(cardId);
+      user.favoritos = favoritos.join(',');
       await user.save();
     }
   }
 
-  static Future<void> updateFuturos(String userId, String futuros) async {
+  static Future<void> addToMinhasCartas(String userId, String cardId) async {
     if (_box == null) await init();
     
     final user = _box!.get(userId);
     if (user != null) {
-      user.futuros = futuros;
+      List<String> minhasCartas = user.minhas_cartas.isEmpty ? [] : user.minhas_cartas.split(',');
+      if (!minhasCartas.contains(cardId)) {
+        minhasCartas.add(cardId);
+        user.minhas_cartas = minhasCartas.join(',');
+        await user.save();
+      }
+    }
+  }
+
+  static Future<void> removeFromMinhasCartas(String userId, String cardId) async {
+    if (_box == null) await init();
+    
+    final user = _box!.get(userId);
+    if (user != null) {
+      List<String> minhasCartas = user.minhas_cartas.isEmpty ? [] : user.minhas_cartas.split(',');
+      minhasCartas.remove(cardId);
+      user.minhas_cartas = minhasCartas.join(',');
       await user.save();
     }
+  }
+
+  static List<String> getFavoritos(String userId) {
+    if (_box == null) return [];
+    final user = _box!.get(userId);
+    return user?.favoritos.isEmpty == true ? [] : user?.favoritos.split(',') ?? [];
+  }
+
+  static List<String> getMinhasCartas(String userId) {
+    if (_box == null) return [];
+    final user = _box!.get(userId);
+    return user?.minhas_cartas.isEmpty == true ? [] : user?.minhas_cartas.split(',') ?? [];
   }
 
   static Future<UserModel?> getUserById(String id) async {
