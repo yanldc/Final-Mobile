@@ -47,7 +47,7 @@ class UserService {
     return null;
   }
 
-  static Future<void> addToFavoritos(String userId, String cardId, {String? cardData}) async {
+  static Future<void> addToFavoritos(String userId, String cardId) async {
     if (_box == null) await init();
     
     final user = _box!.get(userId);
@@ -57,12 +57,6 @@ class UserService {
         favoritos.add(cardId);
         user.favoritos = favoritos.join(',');
         await user.save();
-        
-        // Salva dados da carta localmente se fornecidos
-        if (cardData != null) {
-          final cardBox = await Hive.openBox('cards_cache');
-          await cardBox.put(cardId, cardData);
-        }
       }
     }
   }
@@ -79,7 +73,7 @@ class UserService {
     }
   }
 
-  static Future<void> addToMinhasCartas(String userId, String cardId, {String? cardData}) async {
+  static Future<void> addToMinhasCartas(String userId, String cardId) async {
     if (_box == null) await init();
     
     final user = _box!.get(userId);
@@ -89,12 +83,6 @@ class UserService {
         minhasCartas.add(cardId);
         user.minhas_cartas = minhasCartas.join(',');
         await user.save();
-        
-        // Salva dados da carta localmente se fornecidos
-        if (cardData != null) {
-          final cardBox = await Hive.openBox('cards_cache');
-          await cardBox.put(cardId, cardData);
-        }
       }
     }
   }
@@ -125,8 +113,5 @@ class UserService {
     return user.minhas_cartas.split(',').where((id) => id.isNotEmpty).toList();
   }
 
-  static Future<String?> getCachedCardData(String cardId) async {
-    final cardBox = await Hive.openBox('cards_cache');
-    return cardBox.get(cardId);
-  }
+
 }

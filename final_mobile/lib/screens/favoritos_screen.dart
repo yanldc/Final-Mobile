@@ -38,32 +38,7 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
         final favoritosIds = UserService.getFavoritos(user.id);
         
         if (favoritosIds.isNotEmpty) {
-          List<PokemonCard> cards = [];
-          List<String> idsToFetch = [];
-          
-          for (String id in favoritosIds) {
-            final cachedData = await UserService.getCachedCardData(id);
-            
-            if (cachedData != null) {
-              try {
-                final cardJson = json.decode(cachedData);
-                cards.add(PokemonCard.fromJson(cardJson));
-              } catch (e) {
-                idsToFetch.add(id);
-              }
-            } else {
-              idsToFetch.add(id);
-            }
-          }
-          
-          if (idsToFetch.isNotEmpty) {
-            try {
-              final apiCards = await PokemonApiService.getCardsByIds(idsToFetch);
-              cards.addAll(apiCards);
-            } catch (e) {
-              // Falha silenciosa na API
-            }
-          }
+          final cards = await PokemonApiService.getCardsByIds(favoritosIds);
           
           setState(() {
             _favoritosCards = cards;
