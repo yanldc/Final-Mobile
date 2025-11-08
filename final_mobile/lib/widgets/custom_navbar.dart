@@ -32,6 +32,10 @@ class CustomNavbar extends StatelessWidget {
           icon: Icon(Icons.style),
           label: 'Minhas Cartas',
         ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person),
+          label: 'Minha Conta',
+        ),
       ],
     );
   }

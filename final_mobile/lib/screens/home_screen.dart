@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../widgets/custom_navbar.dart';
 import '../controllers/theme_controller.dart';
-import '../widgets/theme_toggle_button.dart';
 import 'favoritos_screen.dart';
 import 'minhas_cartas_screen.dart';
+import 'minha_conta_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
     const FavoritosScreen(),
     const MinhasCartasScreen(),
+    const MinhaContaScreen(),
   ];
 
   @override
@@ -39,7 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          actions: const [ThemeToggleButton()],
         ),
         body: _getScreens(themeController)[_currentIndex],
         bottomNavigationBar: CustomNavbar(

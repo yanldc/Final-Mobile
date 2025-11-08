@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../services/user_service.dart';
-import '../widgets/theme_toggle_button.dart';
 
 class CadastroScreen extends StatefulWidget {
   const CadastroScreen({super.key});
@@ -58,7 +57,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
-        actions: const [ThemeToggleButton()],
+
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -94,8 +93,10 @@ class _CadastroScreenState extends State<CadastroScreen> {
                     const SizedBox(height: 32),
                     TextFormField(
                       controller: _loginController,
+                      style: const TextStyle(color: Colors.black),
                       decoration: InputDecoration(
                         labelText: 'Login',
+                        labelStyle: const TextStyle(color: Colors.black54),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -121,8 +122,10 @@ class _CadastroScreenState extends State<CadastroScreen> {
                     const SizedBox(height: 20),
                     TextFormField(
                       controller: _senhaController,
+                      style: const TextStyle(color: Colors.black),
                       decoration: InputDecoration(
                         labelText: 'Senha',
+                        labelStyle: const TextStyle(color: Colors.black54),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -149,8 +152,10 @@ class _CadastroScreenState extends State<CadastroScreen> {
                     const SizedBox(height: 20),
                     TextFormField(
                       controller: _confirmarSenhaController,
+                      style: const TextStyle(color: Colors.black),
                       decoration: InputDecoration(
                         labelText: 'Confirmar Senha',
+                        labelStyle: const TextStyle(color: Colors.black54),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),

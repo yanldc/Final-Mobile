@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'models/user_model.dart';
 import 'services/user_service.dart';
+import 'services/auth_service.dart';
 import 'screens/login_screen.dart';
+import 'screens/home_screen.dart';
 import 'controllers/theme_controller.dart';
 
 void main() async {
@@ -12,6 +14,7 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(UserModelAdapter());
   await UserService.init();
+  await AuthService.init();
   
   Get.put(ThemeController());
   
@@ -30,7 +33,7 @@ class MyApp extends StatelessWidget {
       theme: themeController.lightTheme,
       darkTheme: themeController.darkTheme,
       themeMode: themeController.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      home: const LoginScreen(),
+      home: AuthService.isLoggedIn() ? const HomeScreen() : const LoginScreen(),
     );
   }
 }

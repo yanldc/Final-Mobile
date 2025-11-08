@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/user_service.dart';
-import '../widgets/theme_toggle_button.dart';
+import '../services/auth_service.dart';
 import 'cadastro_screen.dart';
 import 'home_screen.dart';
 
@@ -29,6 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (user != null) {
+        await AuthService.setCurrentUser(user);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -74,7 +75,6 @@ class _LoginScreenState extends State<LoginScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        actions: const [ThemeToggleButton()],
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -110,8 +110,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 32),
                     TextFormField(
                       controller: _loginController,
+                      style: const TextStyle(color: Colors.black),
                       decoration: InputDecoration(
                         labelText: 'Login',
+                        labelStyle: const TextStyle(color: Colors.black54),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -134,8 +136,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 20),
                     TextFormField(
                       controller: _senhaController,
+                      style: const TextStyle(color: Colors.black),
                       decoration: InputDecoration(
                         labelText: 'Senha',
+                        labelStyle: const TextStyle(color: Colors.black54),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
