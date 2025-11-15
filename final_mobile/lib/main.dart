@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'models/user_model.dart';
+import 'models/saved_card.dart';
 import 'services/user_service.dart';
 import 'services/auth_service.dart';
 import 'screens/login_screen.dart';
@@ -13,6 +14,7 @@ void main() async {
   
   await Hive.initFlutter();
   Hive.registerAdapter(UserModelAdapter());
+  Hive.registerAdapter(SavedCardAdapter());
   await UserService.init();
   await AuthService.init();
   

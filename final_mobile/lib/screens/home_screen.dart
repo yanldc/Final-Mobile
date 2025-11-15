@@ -78,8 +78,10 @@ class _HomeScreenState extends State<HomeScreen> {
       List<String> minhasCartas = [];
       
       if (user != null) {
-        favoritos = UserService.getFavoritos(user.id);
-        minhasCartas = UserService.getMinhasCartas(user.id);
+        final favCards = UserService.getFavoritos(user.id);
+        favoritos = favCards.map((card) => card.id).toList();
+        final myCards = UserService.getMinhasCartas(user.id);
+        minhasCartas = myCards.map((card) => card.id).toList();
       }
       
       setState(() {
@@ -122,8 +124,10 @@ class _HomeScreenState extends State<HomeScreen> {
       List<String> minhasCartas = [];
       
       if (user != null) {
-        favoritos = UserService.getFavoritos(user.id);
-        minhasCartas = UserService.getMinhasCartas(user.id);
+        final favCards = UserService.getFavoritos(user.id);
+        favoritos = favCards.map((card) => card.id).toList();
+        final myCards = UserService.getMinhasCartas(user.id);
+        minhasCartas = myCards.map((card) => card.id).toList();
       }
       
       setState(() {
@@ -183,7 +187,8 @@ class _HomeScreenState extends State<HomeScreen> {
         await UserService.removeFromFavoritos(user.id, cardId);
         _favoritos.remove(cardId);
       } else {
-        await UserService.addToFavoritos(user.id, cardId);
+        final card = _cards.firstWhere((c) => c.id == cardId);
+        await UserService.addToFavoritos(user.id, card);
         _favoritos.add(cardId);
       }
       setState(() {});
@@ -197,7 +202,8 @@ class _HomeScreenState extends State<HomeScreen> {
         await UserService.removeFromMinhasCartas(user.id, cardId);
         _minhasCartas.remove(cardId);
       } else {
-        await UserService.addToMinhasCartas(user.id, cardId);
+        final card = _cards.firstWhere((c) => c.id == cardId);
+        await UserService.addToMinhasCartas(user.id, card);
         _minhasCartas.add(cardId);
       }
       setState(() {});

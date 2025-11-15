@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'saved_card.dart';
 
 part 'user_model.g.dart';
 
@@ -14,16 +15,17 @@ class UserModel extends HiveObject {
   late String senha;
 
   @HiveField(3)
-  late String favoritos;
+  List<SavedCard> favoritos;
 
   @HiveField(4)
-  late String minhas_cartas;
+  List<SavedCard> minhasCartas;
 
   UserModel({
     required this.id,
     required this.login,
     required this.senha,
-    this.favoritos = '',
-    this.minhas_cartas = '',
-  });
+    List<SavedCard>? favoritos,
+    List<SavedCard>? minhasCartas,
+  }) : favoritos = favoritos ?? [],
+       minhasCartas = minhasCartas ?? [];
 }

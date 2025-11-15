@@ -1,11 +1,9 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/theme_controller.dart';
-import '../services/pokemon_api_service.dart';
 import '../services/user_service.dart';
 import '../services/auth_service.dart';
-import '../models/pokemon_card.dart';
+import '../models/saved_card.dart';
 
 class MinhasCartasScreen extends StatefulWidget {
   const MinhasCartasScreen({super.key});
@@ -15,7 +13,7 @@ class MinhasCartasScreen extends StatefulWidget {
 }
 
 class _MinhasCartasScreenState extends State<MinhasCartasScreen> {
-  List<PokemonCard> _minhasCartasCards = [];
+  List<SavedCard> _minhasCartasCards = [];
   bool _isLoading = true;
   String _error = '';
 
@@ -35,21 +33,12 @@ class _MinhasCartasScreenState extends State<MinhasCartasScreen> {
       final user = AuthService.getCurrentUser();
       
       if (user != null) {
-        final minhasCartasIds = UserService.getMinhasCartas(user.id);
+        final minhasCartas = UserService.getMinhasCartas(user.id);
         
-        if (minhasCartasIds.isNotEmpty) {
-          final cards = await PokemonApiService.getCardsByIds(minhasCartasIds);
-          
-          setState(() {
-            _minhasCartasCards = cards;
-            _isLoading = false;
-          });
-        } else {
-          setState(() {
-            _minhasCartasCards = [];
-            _isLoading = false;
-          });
-        }
+        setState(() {
+          _minhasCartasCards = minhasCartas;
+          _isLoading = false;
+        });
       } else {
         setState(() {
           _minhasCartasCards = [];

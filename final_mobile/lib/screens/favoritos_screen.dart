@@ -1,11 +1,9 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/theme_controller.dart';
-import '../services/pokemon_api_service.dart';
 import '../services/user_service.dart';
 import '../services/auth_service.dart';
-import '../models/pokemon_card.dart';
+import '../models/saved_card.dart';
 
 class FavoritosScreen extends StatefulWidget {
   const FavoritosScreen({super.key});
@@ -15,7 +13,7 @@ class FavoritosScreen extends StatefulWidget {
 }
 
 class _FavoritosScreenState extends State<FavoritosScreen> {
-  List<PokemonCard> _favoritosCards = [];
+  List<SavedCard> _favoritosCards = [];
   bool _isLoading = true;
   String _error = '';
 
@@ -35,21 +33,12 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
       final user = AuthService.getCurrentUser();
       
       if (user != null) {
-        final favoritosIds = UserService.getFavoritos(user.id);
+        final favoritos = UserService.getFavoritos(user.id);
         
-        if (favoritosIds.isNotEmpty) {
-          final cards = await PokemonApiService.getCardsByIds(favoritosIds);
-          
-          setState(() {
-            _favoritosCards = cards;
-            _isLoading = false;
-          });
-        } else {
-          setState(() {
-            _favoritosCards = [];
-            _isLoading = false;
-          });
-        }
+        setState(() {
+          _favoritosCards = favoritos;
+          _isLoading = false;
+        });
       } else {
         setState(() {
           _favoritosCards = [];

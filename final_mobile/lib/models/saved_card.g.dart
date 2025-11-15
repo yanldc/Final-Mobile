@@ -1,44 +1,44 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'user_model.dart';
+part of 'saved_card.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class UserModelAdapter extends TypeAdapter<UserModel> {
+class SavedCardAdapter extends TypeAdapter<SavedCard> {
   @override
-  final int typeId = 0;
+  final int typeId = 1;
 
   @override
-  UserModel read(BinaryReader reader) {
+  SavedCard read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return UserModel(
+    return SavedCard(
       id: fields[0] as String,
-      login: fields[1] as String,
-      senha: fields[2] as String,
-      favoritos: (fields[3] as List?)?.cast<SavedCard>(),
-      minhasCartas: (fields[4] as List?)?.cast<SavedCard>(),
+      name: fields[1] as String,
+      imageUrl: fields[2] as String?,
+      smallImageUrl: fields[3] as String?,
+      setName: fields[4] as String,
     );
   }
 
   @override
-  void write(BinaryWriter writer, UserModel obj) {
+  void write(BinaryWriter writer, SavedCard obj) {
     writer
       ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.login)
+      ..write(obj.name)
       ..writeByte(2)
-      ..write(obj.senha)
+      ..write(obj.imageUrl)
       ..writeByte(3)
-      ..write(obj.favoritos)
+      ..write(obj.smallImageUrl)
       ..writeByte(4)
-      ..write(obj.minhasCartas);
+      ..write(obj.setName);
   }
 
   @override
@@ -47,7 +47,7 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is UserModelAdapter &&
+      other is SavedCardAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

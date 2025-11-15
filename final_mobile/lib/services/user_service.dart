@@ -1,5 +1,7 @@
 import 'package:hive/hive.dart';
 import '../models/user_model.dart';
+import '../models/saved_card.dart';
+import '../models/pokemon_card.dart';
 
 class UserService {
   static const String _boxName = 'users';
@@ -47,15 +49,16 @@ class UserService {
     return null;
   }
 
-  static Future<void> addToFavoritos(String userId, String cardId) async {
+  static Future<void> addToFavoritos(String userId, PokemonCard card) async {
     if (_box == null) await init();
     
     final user = _box!.get(userId);
     if (user != null) {
-      List<String> favoritos = user.favoritos.isEmpty ? [] : user.favoritos.split(',');
-      if (!favoritos.contains(cardId)) {
-        favoritos.add(cardId);
-        user.favoritos = favoritos.join(',');
+      // Verificar se a carta já está nos favoritos
+      bool cardExists = user.favoritos.any((favCard) => favCard.id == card.id);
+      if (!cardExists) {
+        final savedCard = SavedCard.fromPokemonCard(card);
+        user.favoritos.add(savedCard);
         await user.save();
       }
     }
@@ -66,22 +69,20 @@ class UserService {
     
     final user = _box!.get(userId);
     if (user != null) {
-      List<String> favoritos = user.favoritos.isEmpty ? [] : user.favoritos.split(',');
-      favoritos.remove(cardId);
-      user.favoritos = favoritos.join(',');
+      user.favoritos.removeWhere((favCard) => favCard.id == cardId);
       await user.save();
     }
   }
 
-  static Future<void> addToMinhasCartas(String userId, String cardId) async {
+  static Future<void> addToMinhasCartas(String userId, PokemonCard card) async {
     if (_box == null) await init();
     
     final user = _box!.get(userId);
     if (user != null) {
-      List<String> minhasCartas = user.minhas_cartas.isEmpty ? [] : user.minhas_cartas.split(',');
-      if (!minhasCartas.contains(cardId)) {
-        minhasCartas.add(cardId);
-        user.minhas_cartas = minhasCartas.join(',');
+      bool cardExists = user.minhasCartas.any((myCard) => myCard.id == card.id);
+      if (!cardExists) {
+        final savedCard = SavedCard.fromPokemonCard(card);
+        user.minhasCartas.add(savedCard);
         await user.save();
       }
     }
@@ -92,25 +93,37 @@ class UserService {
     
     final user = _box!.get(userId);
     if (user != null) {
-      List<String> minhasCartas = user.minhas_cartas.isEmpty ? [] : user.minhas_cartas.split(',');
-      minhasCartas.remove(cardId);
-      user.minhas_cartas = minhasCartas.join(',');
+      user.minhasCartas.removeWhere((myCard) => myCard.id == cardId);
       await user.save();
     }
   }
 
-  static List<String> getFavoritos(String userId) {
+  static List<SavedCard> getFavoritos(String userId) {
     if (_box == null) return [];
     final user = _box!.get(userId);
-    if (user == null || user.favoritos.isEmpty) return [];
-    return user.favoritos.split(',').where((id) => id.isNotEmpty).toList();
+    if (user == null) return [];
+    return user.favoritos;
   }
 
-  static List<String> getMinhasCartas(String userId) {
+  static bool isFavorite(String userId, String cardId) {
+    if (_box == null) return false;
+    final user = _box!.get(userId);
+    if (user == null) return false;
+    return user.favoritos.any((favCard) => favCard.id == cardId);
+  }
+
+  static List<SavedCard> getMinhasCartas(String userId) {
     if (_box == null) return [];
     final user = _box!.get(userId);
-    if (user == null || user.minhas_cartas.isEmpty) return [];
-    return user.minhas_cartas.split(',').where((id) => id.isNotEmpty).toList();
+    if (user == null) return [];
+    return user.minhasCartas;
+  }
+
+  static bool isMyCard(String userId, String cardId) {
+    if (_box == null) return false;
+    final user = _box!.get(userId);
+    if (user == null) return false;
+    return user.minhasCartas.any((myCard) => myCard.id == cardId);
   }
 
 
