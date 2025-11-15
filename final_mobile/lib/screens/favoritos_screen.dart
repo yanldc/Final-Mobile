@@ -169,6 +169,7 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
           final card = _favoritosCards[index];
           return Card(
             elevation: 4,
+            color: const Color(0xFF6A5ACD),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -222,7 +223,8 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
                         card.name,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 12,
+                          fontSize: 13,
+                          color: Colors.white,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -230,9 +232,9 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
                       const SizedBox(height: 2),
                       Text(
                         card.setName,
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Colors.grey[600],
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Colors.white70,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
